@@ -12,7 +12,7 @@
 <!-- ===== CONFIGURAÇÃO: substitua pelos IDs reais ===== -->
 <script>
   window.HDOM = {
-    webhookUrl: "https://script.google.com/macros/s/AKfycbz1wEq_d4azyfrEmNHnZkkOr3vNb0YJDbTHYtz7ItdMY9UtdhryeVTh9LaiRueELRJo/exec",            // URL do webhook (RD Station, HubSpot, Zapier, CRM...)
+    webhookUrl: "https://script.google.com/macros/s/AKfycbzlcoU6Xyzb1A-i2y8ATRNhBs1jbTo3pitE_dOsLcKrLh7JrZq-WBq2FBOF6c0S3IPp/exec",            // URL do webhook (RD Station, HubSpot, Zapier, CRM...)
     siteUrl: "https://hdomsummit.com.br"
   };
   window.dataLayer = window.dataLayer || [];
@@ -378,11 +378,28 @@ input:focus,select:focus{border-color:var(--verde);box-shadow:0 0 0 3px rgba(160
       document.getElementById("formErro").style.display = "block";
     }
 
-    if (!window.HDOM.webhookUrl){ done(); return; }   // sem webhook configurado: segue o fluxo
-    fetch(window.HDOM.webhookUrl, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)})
-      .then(function(r){ r.ok ? done() : fail(); })
-      .catch(fail);
-  });
+    if (!window.HDOM.webhookUrl){ 
+  done(); 
+  return; 
+}   // sem webhook configurado: segue o fluxo
+
+fetch(window.HDOM.webhookUrl, {
+  method: "POST",
+  mode: "no-cors",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: JSON.stringify(payload)
+})
+.then(function(){
+  // Com no-cors não conseguimos ler a resposta do Apps Script,
+  // então seguimos o fluxo após o envio da requisição.
+  done();
+})
+.catch(function(error){
+  console.error("Erro ao enviar os dados:", error);
+  fail();
+});
 
   /* ---------- Redirecionamento ---------- */
   document.getElementById("goSite").addEventListener("click", function(e){
